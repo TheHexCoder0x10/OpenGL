@@ -45,8 +45,8 @@ def surf_to_texture(surf):
 t = 0
 
 while True:
-    display.fill((0, 0, 0))
-    display.blit(img, (0, 0))
+    display.fill((0, 0, 0, 255))
+    #display.blit(img, (0, 0))
 
     t += 1
 
@@ -71,16 +71,17 @@ while True:
 
     mouse_pos = pygame.mouse.get_pos()
 
-    pygame.draw.rect(display, (0, 0, 255), (x, y, 100, 100), 1)
+    #pygame.draw.rect(display, (255, 255, 255), (x, y, 100, 100), 0)
+    pygame.draw.rect(display, (0, 0, 255), (x, y, 100, 100), 2)
     text = font.render(str(int(clock.get_fps())), True, (255, 255, 255))
     display.blit(text, (0, 0))
     frame_tex = surf_to_texture(display)
     frame_tex.use(0)
     program['tex'] = 0
-    program['threshold'] = (800 - mouse_pos[0]) / 800
-    program['exposure'] = mouse_pos[1] / 200
-    program['width'] = 800
-    program['height'] = 600
+    #program['threshold'] = (800 - mouse_pos[0]) / 800
+    #program['exposure'] = mouse_pos[1] / 200
+    #program['width'] = 800
+    #program['height'] = 600
     render_object.render(mode=moderngl.TRIANGLE_STRIP)
 
     pygame.display.flip()
