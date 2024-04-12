@@ -79,8 +79,8 @@ while True:
     program['tex'] = 0
     program['threshold'] = (800 - mouse_pos[0]) / 800
     program['exposure'] = mouse_pos[1] / 200
-    #program['width'] = 800
-    #program['height'] = 600
+    program['width'] = 800
+    program['height'] = 600
     render_object.render(mode=moderngl.TRIANGLE_STRIP)
 
     pygame.display.flip()
