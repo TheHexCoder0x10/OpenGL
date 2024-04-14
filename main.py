@@ -1,3 +1,4 @@
+import math
 import sys
 from array import array
 
@@ -10,7 +11,6 @@ screen = pygame.display.set_mode((800, 600), pygame.OPENGL | pygame.DOUBLEBUF)
 display = pygame.Surface((800, 600))
 ctx = moderngl.create_context()
 clock = pygame.time.Clock()
-img = pygame.image.load('random2.jpg')
 quad_buffer = ctx.buffer(data=array('f', [
     # position (x, y), uv coords (x, y)
     -1.0, 1.0, 0.0, 0.0,  # topleft
@@ -19,10 +19,11 @@ quad_buffer = ctx.buffer(data=array('f', [
     1.0, -1.0, 1.0, 1.0,  # bottomright
 ]))
 font = pygame.font.SysFont('Arial', 64)
-x = 1
-y = 0
+x = 100
+y = 100
 xv = 0
 yv = 0
+keys = [False] * 4
 
 
 with open ('Assets/Shaders/Vert.glsl', 'r') as f:
@@ -41,12 +42,27 @@ def surf_to_texture(surf):
     tex.write(surf.get_view('1'))
     return tex
 
+def render_main():
+    global display
+    frame_tex = surf_to_texture(display)
+    frame_tex.use(0)
+    program['tex'] = 0
+    program['expos'] = mouse_pos[1] / 200
+    program['width'] = 800
+    program['height'] = 600
+    program['radius'] = 15#round(mouse_pos[0] / 30)
+    print(mouse_pos[1] / 200, round(mouse_pos[0] / 30))
+    render_object.render(mode=moderngl.TRIANGLE_STRIP)
+    pygame.display.flip()
+    frame_tex.release()
+
+def handle_keys():
+    global xv, yv, keys
 
 t = 0
 
 while True:
     display.fill((0, 0, 0, 255))
-    #display.blit(img, (0, 0))
 
     t += 1
 
@@ -56,13 +72,23 @@ while True:
             sys.exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                yv -= 1
+                keys[0] = True
             if event.key == pygame.K_DOWN:
-                yv += 1
+                keys[1] = True
             if event.key == pygame.K_LEFT:
-                xv -= 1
+                keys[2] = True
             if event.key == pygame.K_RIGHT:
-                xv += 1
+                keys[3] = True
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_UP:
+                keys[0] = False
+            if event.key == pygame.K_DOWN:
+                keys[1] = False
+            if event.key == pygame.K_LEFT:
+                keys[2] = False
+            if event.key == pygame.K_RIGHT:
+                keys[3] = False
+
 
     x += xv
     y += yv
@@ -71,19 +97,10 @@ while True:
 
     mouse_pos = pygame.mouse.get_pos()
 
-    #pygame.draw.rect(display, (255, 255, 255), (x, y, 100, 100), 0)
+    pygame.draw.rect(display, (255, 255, 255), (x, y, 100, 100), 0)
     pygame.draw.rect(display, (0, 0, 255), (x, y, 100, 100), 2)
     text = font.render(str(int(clock.get_fps())), True, (255, 255, 255))
     display.blit(text, (0, 0))
-    frame_tex = surf_to_texture(display)
-    frame_tex.use(0)
-    program['tex'] = 0
-    #program['threshold'] = (800 - mouse_pos[0]) / 800
-    #program['exposure'] = mouse_pos[1] / 200
-    #program['width'] = 800
-    #program['height'] = 600
-    render_object.render(mode=moderngl.TRIANGLE_STRIP)
 
-    pygame.display.flip()
-    frame_tex.release()
+    render_main()
     clock.tick()
